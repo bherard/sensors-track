@@ -1,4 +1,7 @@
 # Sensors Track
 
-Infra de connexion de capteurs pour LabTrack.
+Sesonsors mediation platform for LabTrack.
+
+* [rpi](rpi) folder: Raspberry related code
+* [arduino](arduino): Arduino related code.
  
