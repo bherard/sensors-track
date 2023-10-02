@@ -1,0 +1,4 @@
+include version.txt
+include requirements.txt
+include sensotrack/conf/*
+exclude sensotrack/conf/sensotrack.json
