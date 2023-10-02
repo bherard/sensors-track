@@ -1,0 +1,40 @@
+#!/bin/bash
+set -e
+WORKERS=$(expr $(nproc) + 1) 
+SCRIPT_NAME=$0
+PORT=8080
+
+function usage(){
+    cat << EOF
+Usage:
+    $SCRIPT_NAME [ -workers N] [-p PORT] [-h]
+        -workers: Number of parallel workers for web server
+        -p: Listeing port (default $PORT)
+        -h: print help message and exit
+EOF
+    exit 1
+}
+
+while [ "$1" != "" ]; do
+   if [ "$1" == "-h" ] ; then
+        usage
+    elif [ "$1" == "-workers" ] ; then
+        shift
+        WORKERS=$1
+    elif [ "$1" == "-p" ] ; then
+        shift
+        PORT=$1
+    elif [ "$1" == "-version" ] ; then
+        app_file=$(
+            python <<EOF
+import sensotrack.app
+print(sensotrack.app.__file__)
+EOF
+        )
+        python $app_file $1
+        exit 0
+    fi
+    shift
+done
+cd $(dirname $0)
+gunicorn -c gunicorn_conf.py -w 1 -b 0.0.0.0:$PORT sensotrack.app:APP

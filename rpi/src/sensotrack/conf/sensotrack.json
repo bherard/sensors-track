@@ -1,0 +1,10 @@
+{
+    "datadir": "/tmp/",
+    "logging": {
+        "level": "DEBUG",
+        "file": "/tmp/sensotrack.log",
+        "enable_stdout_stderr": true,
+        "file_size_M": 10,
+        "rotation_count": 5
+    }
+}
