@@ -20,7 +20,10 @@ import flask
 from flask import Blueprint, Flask, request
 from werkzeug.exceptions import NotAcceptable, HTTPException, UnsupportedMediaType
 
+from sensotrack.services.bus import Receiver
+from sensotrack.services.sensors import SensorService
 from sensotrack import settings, __version__
+from sensotrack.services.connectors import ConnectorsManager
 from sensotrack.utils import load_conf, dirname
 from sensotrack.utils.logging import LoggingConfig
 
@@ -75,6 +78,7 @@ def initialize_app(flask_app):
     # Imports a AFTER load_config() to ensure SUPPORTED_EVENT_TYPES is populated form config
     # pylint: disable=import-outside-toplevel
     from sensotrack.api.endpoints.admin import NS as admin_ns  # pylint: disable=unused-import
+    from sensotrack.api.endpoints.sensors import NS as sensors_ns  # pylint: disable=unused-import
     # from scoring.api.endpoints.session_risk import NS as session_ns  # pylint: disable=unused-import
     # from scoring.api.endpoints.user_risk import NS as user_ns  # pylint: disable=unused-import
     # from scoring.api.endpoints.event_risk import NS as event_ns  # pylint: disable=unused-import
@@ -179,6 +183,9 @@ def load_config():
 
 
     settings.conf = load_conf(settings.CONFIG_FILES["app"])
+    if 'dataCleaning' not in settings.conf:
+        settings.conf["dataCleaning"] = settings.data_cleaning
+
     LoggingConfig.configure_logging(
         settings.conf,
         f'{dirname(__file__)}/{settings.CONFIG_FILES["log"]}',
@@ -187,6 +194,15 @@ def load_config():
 
     logger = logging.getLogger(__name__)
     logger.debug("APP Is configured")
+
+    bus_receiver = Receiver(settings.conf)
+    bus_receiver.start()
+
+    connector_manager = ConnectorsManager(settings.conf)
+    connector_manager.start_connectors()
+
+    sensor_svc = SensorService(settings.conf)
+    sensor_svc.start_data_cleaner()
 
     initialize_app(APP)
 

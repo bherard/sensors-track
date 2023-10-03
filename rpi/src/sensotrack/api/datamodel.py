@@ -37,3 +37,24 @@ API_STATUS = API.model('ServerStatus', {
         required=False,
     )
 })
+
+SENSOR_VALUE =  API.model('SensorValue', {
+    "sensorId": fields.String(
+        required=True,
+        description="Sensor Identifier"
+    ),
+    'value': fields.String(
+        required=True,
+        description="Sensort value"
+    ),
+    "measurementDate": fields.String(
+        required=True,
+        description="Measurement date using ISO format"
+    )
+})
+SENSOR_COMMAND = API.model('SensorCommand', {
+    "command": fields.String(
+        required=True,
+        description="Command to send to sensor"
+    )
+})

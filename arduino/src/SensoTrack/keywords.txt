@@ -1,0 +1,23 @@
+#######################################
+# Syntax Coloring Map For SensoTrack
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+SerialCom	KEYWORD1
+SensoTrack	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+handleSerialCom	KEYWORD2
+senso_track_lib_init	KEYWORD2
+senso_track_lib_declare_sensor	KEYWORD2
+senso_track_send	KEYWORD2
+senso_track_on_loop()	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################

@@ -1,10 +1,20 @@
 {
-    "datadir": "/tmp/",
+    "datadir": "/home/jmjb0521/Dev/Ocara/sensors-track/rpi/data",
     "logging": {
         "level": "DEBUG",
         "file": "/tmp/sensotrack.log",
         "enable_stdout_stderr": true,
         "file_size_M": 10,
         "rotation_count": 5
-    }
+    },
+    "mqtt": {
+        "host": "localhost",
+        "port": 1883
+    },
+    "connectors": [
+        {
+            "class": "sensotrack.services.connectors.serial.TTYConnector",
+            "logLevel": "DEBUG"
+        }
+    ]
 }

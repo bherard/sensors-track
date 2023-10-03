@@ -40,6 +40,10 @@ CONFIG_FILES = {
     "log": "conf/logging.json"
 }
 
+data_cleaning = {
+    "retention_s": 86400,
+    "period": 3600
+}
 
 # Runtime configuration
 conf = {}  # pylint: disable=invalid-name

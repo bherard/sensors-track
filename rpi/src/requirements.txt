@@ -2,3 +2,6 @@ gunicorn>=20.0.4
 flask-restx>=1.1.0
 colorlog>=6.7.0
 python-json-logger>=2.0.7
+paho-mqtt>=1.6.1
+pyserial>=3.5
+pyudev>=0.24.1
