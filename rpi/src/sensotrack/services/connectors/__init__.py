@@ -42,7 +42,7 @@ class Connector:
         self._main_thread = None
 
     def on_start(self):
-        pass
+        """Method called when connector start."""
 
     def _start_impl(self):
         self._logger.info("Starting connector %s", __name__)
@@ -109,6 +109,7 @@ class Connector:
         self._command_receiver.stop()
 
     def join(self):
+        """Wait until connector stops."""
         if self._main_thread:
             self._main_thread.join()
         self._command_receiver.join()

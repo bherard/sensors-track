@@ -11,6 +11,7 @@ class SerialConnector(Connector):
     """Connect over serial."""
     DISCOVERY_PERIOD = 5
     _SEPARATOR = "/:/"
+    _MAX_READ_TRY = 10
 
     _devices = {}
     _discovery_thread = None
@@ -43,7 +44,6 @@ class SerialConnector(Connector):
 
 
     def _register_device(self, dev_name):
-        MAX_TRY = 10
         try:
             self._logger.info("Registring device %s", dev_name)
             ser = serial.Serial(
@@ -59,11 +59,11 @@ class SerialConnector(Connector):
 
             count = 0
             line = self._read_line(ser)
-            while line != "***START***" and count < MAX_TRY:
+            while line != "***START***" and count < self._MAX_READ_TRY:
                 line = self._read_line(ser)
                 count += 1
 
-            if count >= MAX_TRY:
+            if count >= self._MAX_READ_TRY:
                 self._logger.warning(
                     "Device %s is probably not a supported device",
                     dev_name
@@ -72,7 +72,7 @@ class SerialConnector(Connector):
 
             count = 0
             line = self._read_line(ser)
-            while line != "***DONE***" and count < MAX_TRY:
+            while line != "***DONE***" and count < self._MAX_READ_TRY:
                 if line.startswith(f"SENSOR{SerialConnector._SEPARATOR}"):
                     parts = line.split(SerialConnector._SEPARATOR)
                     sensors.append(parts[1])
@@ -84,7 +84,7 @@ class SerialConnector(Connector):
                 line = self._read_line(ser)
                 count += 1
 
-            if count >= MAX_TRY:
+            if count >= self._MAX_READ_TRY:
                 self._logger.warning(
                     "Device %s is probably not a supported device",
                     dev_name
@@ -191,6 +191,7 @@ class SerialConnector(Connector):
                         }
         except OSError:
             return None
+        return None
 
     def join(self):
         if self._discovery_thread:

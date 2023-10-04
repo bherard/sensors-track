@@ -33,7 +33,7 @@ class SensorDAO:
         :param sensor: sensor to persist
         :type sensor: dict
         """
-        
+
         data_file_name = f'{self._conf["datadir"]}/{sensor["sensorId"]}.json'
         with open(data_file_name, "w", encoding="utf-8") as data_file:
             data_file.write(f'{json.dumps(sensor)}')

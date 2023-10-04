@@ -29,7 +29,7 @@ class MQTTClient:
 
 
     # Method tigggerd by MQTT client on connection to MQTT Server
-    def _on_connect(self, client, userdata, flags, return_code):
+    def _on_connect(self, client, userdata, flags, return_code): #pylint: disable=unused-argument
         """Subscribe to MQTT topic when connected."""
 
         self._logger.info("Connected to MQTT server with result code %s: ", return_code)
@@ -40,10 +40,10 @@ class MQTTClient:
         self._logger.info("Subscribing to topics %s", self._topics)
         client.subscribe([(topic ,0) for topic in self._topics])
 
-    def _on_message(self, client, userdata, msg):
+    def _on_message(self, client, userdata, msg): #pylint: disable=unused-argument
         """Receive message form MQTT and process it as // thread."""
 
-        self._sem.acquire()
+        self._sem.acquire() #pylint: disable=consider-using-with
         Thread(target=self._process_message, args=(msg,)).start()
 
     def _process_message(self, msg):
@@ -56,7 +56,7 @@ class MQTTClient:
 
         raise NotImplementedError()
 
-    def _on_disconnect(self, client, userdata, rc):
+    def _on_disconnect(self, client, userdata, return_code): #pylint: disable=unused-argument
         self._logger.debug("Disconnected")
         client.loop_stop(True)
         client.disconnect()

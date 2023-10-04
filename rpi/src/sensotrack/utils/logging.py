@@ -36,7 +36,8 @@ class LoggingConfig:
     """Logging configuration utility class."""
 
     @staticmethod
-    def _disable_stdout(logger):
+    def disable_stdout(logger):
+        """Disable stout/stderr for a logger."""
         hdlrs_to_remove = []
         for hdlr in  logger.handlers:
             if "stream" in dir(hdlr) \
@@ -108,10 +109,6 @@ class LoggingConfig:
         logging.config.dictConfig(
             logging_config
         )
-        # logging.config.fileConfig(
-        #     logging_config_file,
-        #     disable_existing_loggers=False  # To avoid sub thread disabling loggers when stating
-        # )
 
         logging.getLogger().setLevel(
             logging.getLevelName(
@@ -123,4 +120,4 @@ class LoggingConfig:
         if "enable_stdout_stderr" in conf["logging"] and \
             not conf["logging"]["enable_stdout_stderr"]:
             # Remove console for root logger
-            LoggingConfig._disable_stdout(logging.getLogger())
+            LoggingConfig.disable_stdout(logging.getLogger())

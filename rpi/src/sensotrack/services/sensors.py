@@ -121,6 +121,7 @@ class SensorService:
             time.sleep(self._conf["dataCleaning"]["period"])
 
     def start_data_cleaner(self):
+        """Start data clener thread."""
         threading.Thread(
             target=self._data_cleaner_impl,
             daemon=True

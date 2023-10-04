@@ -78,4 +78,3 @@ def http_error_handler(http_exception):
             'code': app_code
         }, http_exception.code
     return None
-

@@ -2,7 +2,6 @@
 """User Scoring API datamodel description."""
 from flask_restx import fields
 from sensotrack.api.restx import API
-from sensotrack import settings
 
 ERROR = API.model("Error", {
     'message': fields.String(
