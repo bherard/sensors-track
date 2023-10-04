@@ -2,58 +2,66 @@
  # Module Name : Arduino Library
  # Version : 1.0.0
  #
- # Software Name : SerialCom
+ # Software Name : Senso Track
  # Version : 1.0
  #
- # Copyright (c) 2015 Zorglub42
+ # Copyright (c) 2023 benoit.herard(at)orange.com
  # This software is distributed under the Apache 2 license
  # <http://www.apache.org/licenses/LICENSE-2.0.html>
  #
  ##--------------------------------------------------------
- # File Name   : SerialCom.h
  #
- # Created     : 2015-12
- # Authors     : Zorglub42 <contact(at)zorglub42.fr>
+ # Created     : 2023-10
+ # Authors     : Benoit HERARD <benoit.herard(at)orange.com>
  #
  # Description :
- #     simple example to connect to socket server
+ #    simple example to connect to remote using Serial
  ##--------------------------------------------------------
  # History     :
- # 1.0.0 - 2015-12-03 : Release of the file
+ # 1.0.0 - 2023-09 : Release of the file
  #
  */
 #include <SerialCom.h>
 #include <SensoTrack.h>
 
-// Create object to handle connection to socket server
-// Can use as well HardwareSerial as SoftwareSerial
+// Create object to handle connection over serial
+// (Can be as well HardwareSerial as SoftwareSerial)
 SerialCom com(&Serial);
 
+// Read an alaong pin and send sesnor value as sid sensor
+void read_and_send(char sid, int pin){
+  char buff[10];
+  sprintf(buff, "%d", digitalRead(pin));
+  senso_track_send(sid, buff);
+}
+
+// Function called by sens_track_lib when a command cmd is received from remote for sensor sid
 void on_command(char *sid, char *cmd){
-  Serial.println(strlen(cmd));
-  delay(500);
   Serial.print("Received command >"); Serial.print(cmd); Serial.print("< for >"); Serial.print(sid);Serial.println("<");
-  if (strcmp(sid, "A0")==0){
-    senso_track_send("A0", "10");
+  if (strcmp(sid, "S0") == 0){
+    read_and_send("S0", A0);
   }
 }
 void setup() {
-        // start object
+        // start serial connection handler
         com.begin(9600);
-        com.println("Arduino Started");
+
+        Serial.println("Arduino Started");
         
         senso_track_lib_init(&com, &on_command);
-        senso_track_lib_declare_sensor("A0");
-        senso_track_lib_declare_sensor("A1");
-        senso_track_lib_declare_sensor("A2");
-        senso_track_lib_declare_sensor("A3");
+        senso_track_lib_declare_sensor("S0");
+        senso_track_lib_declare_sensor("S1");
+        senso_track_lib_declare_sensor("S2");
+        senso_track_lib_declare_sensor("S3");
         
 }
 
 
 void loop() {
-  //com.handleSerialCom();
   senso_track_on_loop();
-  //senso_track_send("A1", "30");
-  //delay(1000);
+  read_and_send("S0", A0);
+  read_and_send("S1", A1);
+  read_and_send("S2", A2);
+  read_and_send("S3", A3);
+  delay(1000);
 }
