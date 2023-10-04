@@ -27,7 +27,7 @@ class ServerThread(threading.Thread):
         self.server.shutdown()
 
 
-class TestErrorsReturn(unittest.TestCase):
+class TestFlaskAPI(unittest.TestCase):
     """Test common errors return codes."""
 
     _server = None
@@ -106,27 +106,6 @@ class TestErrorsReturn(unittest.TestCase):
         )
         self._assert_error_structure(resp, 415)
 
-
-class TestAdmin(unittest.TestCase):
-    """Test Admin endpoins."""
-
-    _server = None
-
-    @classmethod
-    @mock.patch("sensotrack.app.Receiver", mock.MagicMock())
-    @mock.patch("sensotrack.app.SensorService", mock.MagicMock())
-    @mock.patch("sensotrack.app.ConnectorsManager", mock.MagicMock())
-    def setUpClass(cls) -> None:
-        load_config()
-        cls._server = ServerThread(APP)
-        cls._server.start()
-        return super().setUpClass()
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        cls._server.shutdown()
-        return super().tearDownClass()
-
     def test_status(self):
         """Test /v1/status endpoint."""
         resp = requests.get(
@@ -139,26 +118,6 @@ class TestAdmin(unittest.TestCase):
         )
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json()["status"], "OK")
-
-class TestSensors(unittest.TestCase):
-    """Test Sensors endpoint."""
-
-    _server = None
-
-    @classmethod
-    @mock.patch("sensotrack.app.Receiver", mock.MagicMock())
-    @mock.patch("sensotrack.app.SensorService", mock.MagicMock())
-    @mock.patch("sensotrack.app.ConnectorsManager", mock.MagicMock())
-    def setUpClass(cls) -> None:
-        load_config()
-        cls._server = ServerThread(APP)
-        cls._server.start()
-        return super().setUpClass()
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        cls._server.shutdown()
-        return super().tearDownClass()
 
 
     @mock.patch("paho.mqtt.client.Client")

@@ -7,10 +7,13 @@ import pyudev
 import serial
 from sensotrack.services.connectors import Connector
 
-class TTYConnector(Connector):
-    SEPARATOR = "/:/"
+class SerialConnector(Connector):
+    """Connect over serial."""
+    DISCOVERY_PERIOD = 5
+    _SEPARATOR = "/:/"
 
     _devices = {}
+    _discovery_thread = None
 
     def __init__(self, conf):
         super().__init__(conf)
@@ -48,10 +51,10 @@ class TTYConnector(Connector):
                     9600,
                     timeout=0.1
                 )
-            time.sleep(5)
+            time.sleep(self.DISCOVERY_PERIOD)
             sensors = []
             ser.write(
-                f'COMMAND{TTYConnector.SEPARATOR}SENSORS\n'.encode("utf-8")
+                f'COMMAND{SerialConnector._SEPARATOR}SENSORS\n'.encode("utf-8")
             )
 
             count = 0
@@ -70,8 +73,8 @@ class TTYConnector(Connector):
             count = 0
             line = self._read_line(ser)
             while line != "***DONE***" and count < MAX_TRY:
-                if line.startswith(f"SENSOR{TTYConnector.SEPARATOR}"):
-                    parts = line.split(TTYConnector.SEPARATOR)
+                if line.startswith(f"SENSOR{SerialConnector._SEPARATOR}"):
+                    parts = line.split(SerialConnector._SEPARATOR)
                     sensors.append(parts[1])
                     self._logger.debug(
                         "Sensor %s discovered for %s",
@@ -123,7 +126,7 @@ class TTYConnector(Connector):
     def _find_arduinos(self):
         """Search ttys."""
 
-        while True:
+        while self._running:
             context = pyudev.Context()
             found_devices = []
             for device in context.list_devices(subsystem='tty', ID_BUS='usb'):
@@ -139,13 +142,14 @@ class TTYConnector(Connector):
                     devices_to_remove.append(dev)
             for dev in devices_to_remove:
                 self._unregister_device(dev)
-            time.sleep(5)
+            time.sleep(self.DISCOVERY_PERIOD)
 
 
     def on_start(self):
-        threading.Thread(
+        self._discovery_thread = threading.Thread(
             target=self._find_arduinos
-        ).start()
+        )
+        self._discovery_thread.start()
 
 
     def supported_sensors(self):
@@ -164,9 +168,9 @@ class TTYConnector(Connector):
                 sid
             )
             command = (
-                f'COMMAND{TTYConnector.SEPARATOR}'
-                f'SENSOR{TTYConnector.SEPARATOR}'
-                f'{sid}{TTYConnector.SEPARATOR}{command}'
+                f'COMMAND{SerialConnector._SEPARATOR}'
+                f'SENSOR{SerialConnector._SEPARATOR}'
+                f'{sid}{SerialConnector._SEPARATOR}{command}'
                 '\n'
             )
             ser.write(command.encode("utf-8"))
@@ -177,8 +181,8 @@ class TTYConnector(Connector):
             for dev in self._devices.items():
                 if dev[1]["serial"].in_waiting:
                     line = self._read_line(dev[1]["serial"])
-                    if line.startswith(f"DATA{TTYConnector.SEPARATOR}"):
-                        parts = line.split(TTYConnector.SEPARATOR)
+                    if line.startswith(f"DATA{SerialConnector._SEPARATOR}"):
+                        parts = line.split(SerialConnector._SEPARATOR)
                         sid = parts[1]
                         value = parts[2]
                         return{
@@ -187,3 +191,8 @@ class TTYConnector(Connector):
                         }
         except OSError:
             return None
+
+    def join(self):
+        if self._discovery_thread:
+            self._discovery_thread.join()
+        super().join()

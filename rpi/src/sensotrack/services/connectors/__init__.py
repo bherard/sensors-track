@@ -46,8 +46,8 @@ class Connector:
 
     def _start_impl(self):
         self._logger.info("Starting connector %s", __name__)
-        self.on_start()
         self._running = True
+        self.on_start()
         while self._running:
             data = self.read_data()
             if data:
